@@ -8,7 +8,11 @@ var startSpeed = 5;
 var cactus_array = [];
 var players = [];
 var populationSize = 1000;
+var mutationRate = 0.05;
 var closestCactusDistance;
+
+var fitnessHistory = [];
+var genNumber = 1;
 
 var cycles = 1;
 
@@ -78,7 +82,9 @@ function draw() {
     }
 
     fill(255, 0, 0);
-    rect(getClosestCactus() + w_g * (1 / 5), floor_y, 10, 10)
+    let distances = getClosestCactus();
+    rect(distances.lowestDist + w_g * (1 / 5), floor_y, 10, 10)
+    rect(distances.secondLowestDist + w_g * (1 / 5), floor_y, 10, 10)
 }
 
 function makeNewGen() {
@@ -93,15 +99,22 @@ function makeNewGen() {
             bestFit = p.fitness;
         }
     }
+    fitnessHistory.push(bestPlayer.fitness);
+    genNumber++;
 
     let newPop = [bestPlayer];//add best from last gen to this
 
     for (let i = 0; i < populationSize - 1; i++) {
         let parentA = pickParent(totalFitness);
         let parentB = pickParent(totalFitness);
-        newPop.push(player.cross(parentA, parentB));
+        let newPlayer = player.cross(parentA, parentB);
+        if (Math.random() < mutationRate) {
+            newPlayer.nn.mutate();
+        }
+        newPop.push(newPlayer);
     }
     players = newPop;
+    drawChart(fitnessHistory);
 }
 
 function pickParent(totalFitness) {
@@ -118,16 +131,18 @@ function pickParent(totalFitness) {
 
 function getClosestCactus() {
     let lowestDist = Infinity;
+    let secondLowestDist = Infinity;
     for (let i = 0; i < cactus_array.length; i++) {
         let dist = (cactus_array[i].x - w_g * (1 / 5));
         if (dist < 0) {
             continue;
         }
         if (dist < lowestDist) {
+            secondLowestDist = lowestDist;
             lowestDist = (cactus_array[i].x - w_g * (1 / 5));
         }
     }
-    return lowestDist;
+    return { lowestDist: lowestDist, secondLowestDist: secondLowestDist };
 }
 
 class cactus {
@@ -156,7 +171,7 @@ class player {
         this.h = 50;
         this.canJump = false;
         this.alive = true;
-        this.nn = new NeuralNetwork(4);
+        this.nn = new NeuralNetwork(5);
         this.nn.addLayer(4);
         this.nn.addLayer(1);
 
@@ -176,7 +191,7 @@ class player {
     }
 
     makeDecision() {
-        let d = this.nn.feedForward([closestCactusDistance / w_g, this.y / h_g, this.vy / 20, speed_g / 20]);
+        let d = this.nn.feedForward([closestCactusDistance.lowestDist / w_g, closestCactusDistance.secondLowestDist / w_g, this.y / h_g, this.vy / 20, speed_g / 20]);
         if (d[0] > 0) {
             this.jump();
         }

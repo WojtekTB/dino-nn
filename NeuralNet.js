@@ -26,6 +26,14 @@ class NeuralNetwork {
         return newNN;
     }
 
+    mutate() {
+        for (let i = 0; i < this.layers.length; i++) {
+            let r = Math.floor(Math.random() * this.layers[i].rows);
+            let c = Math.floor(Math.random() * this.layers[i].columns);
+            this.layers[i].data[r][c] += (Math.random() * 2) - 1;
+        }
+    }
+
     feedForward(input) {
         let input_array = input.concat([1]);
         let input_matrix = Matrix.fromArray(input_array);
