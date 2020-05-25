@@ -7,7 +7,7 @@ var startSpeed = 5;
 // var p;
 var cactus_array = [];
 var players = [];
-var populationSize = 100;
+var populationSize = 1000;
 var closestCactusDistance;
 
 var cycles = 1;
