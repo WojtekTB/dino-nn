@@ -18,6 +18,14 @@ class NeuralNetwork {
         this.layers = [];
     }
 
+    static cross(a, b) {
+        let newNN = new NeuralNetwork(a.numberOfInputs);
+        for (let i = 0; i < a.layers.length; i++) {
+            newNN.layers.push(Matrix.cross(a.layers[i], b.layers[i]));
+        }
+        return newNN;
+    }
+
     feedForward(input) {
         let input_array = input.concat([1]);
         let input_matrix = Matrix.fromArray(input_array);
@@ -48,11 +56,11 @@ class NeuralNetwork {
         }
     }
 
-    addOutput(numberOfOutputs) {
-        let m = new Matrix(numberNodes, this.layers[this.layers.length - 1].rows + 1);
-        m.randomize();
-        this.layers.push(m);
-    }
+    // addOutput(numberOfOutputs) {
+    //     let m = new Matrix(numberNodes, this.layers[this.layers.length - 1].rows + 1);
+    //     m.randomize();
+    //     this.layers.push(m);
+    // }
 
     setOutputFunction(f) {
         this.outputFunction = f;
@@ -93,6 +101,80 @@ class Matrix {
                 this.set((Math.random() * 2) - 1, i, j);
             }
         }
+    }
+
+    static cross(a, b) {
+        //this is a really shitty implementation of this but I am too lazy to figure out how to do it cleanly right now
+        let mA;
+        let mB;
+        let r = Math.random();
+        if (r > 0) {
+            mA = a;
+            mB = b;
+        } else {
+            mA = b;
+            mB = a;
+        }
+
+        let arrayA = Matrix.matrixToOneDArray(mA)
+        let arrayB = Matrix.matrixToOneDArray(mB)
+        let n = [];
+        let start = 0;
+        let len = Math.floor((arrayA.length / 3) * Math.random());
+        let chosenArray = arrayA;
+        while (true) {
+            // console.log("ree");
+            if (start + len > arrayA.length) {
+                len = arrayA.length - start;
+                n = n.concat(chosenArray.slice(start, start + len + 1));
+                break;
+            }
+            n = n.concat(chosenArray.slice(start, start + len + 1));
+
+            if (chosenArray === arrayA) {
+                chosenArray = arrayB;
+            } else {
+                chosenArray = arrayA;
+            }
+
+            start += len;
+            len = Math.floor((arrayA.length / 3) * Math.random());
+
+        }
+        let output = Matrix.toMatrix(a.rows, a.columns, n);;
+        // console.log(output)
+
+        return output;
+    }
+
+    static toMatrix(r, c, data) {
+        let n = new Matrix(r, c);
+        for (let i = 0; i < n.rows; i++) {
+            for (let j = 0; j < n.columns; j++) {
+                n.data[i][j] = data[(i * c) + j];
+            }
+        }
+        return n;
+    }
+
+    static matrixToOneDArray(m) {
+        let a = [];
+        for (let i = 0; i < m.rows; i++) {
+            for (let j = 0; j < m.columns; j++) {
+                a.push(m.data[i][j]);
+            }
+        }
+        return a;
+    }
+
+    static copy(m) {
+        let n = new Matrix(m.rows, m.columns);
+        for (let i = 0; i < n.rows; i++) {
+            for (let j = 0; j < n.columns; j++) {
+                n.data[i][j] = m.data[i][j];
+            }
+        }
+        return n;
     }
 
     static applyToAll(m, f) {
