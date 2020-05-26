@@ -7,8 +7,8 @@ var startSpeed = 5;
 // var p;
 var cactus_array = [];
 var players = [];
-var populationSize = 1000;
-var mutationRate = 0.05;
+var populationSize = 100;
+var mutationRate = 0.01;
 var closestCactusDistance;
 
 var fitnessHistory = [];
@@ -32,12 +32,11 @@ function setup() {
 }
 
 function draw() {
-    closestCactusDistance = getClosestCactus();
+    let alldead = true;
 
     background(100);
     fill(200);
     rect(0, floor_y, w_g, h_g - floor_y);
-    let alldead = true;
     for (let i = 0; i < players.length; i++) {
         if (players[i].alive) {
             players[i].show();
@@ -48,6 +47,7 @@ function draw() {
     }
 
     for (let i = 0; i < cycles; i++) {
+        closestCactusDistance = getClosestCactus();
         for (let i = 0; i < players.length; i++) {
             if (players[i].alive) {
                 players[i].update()
@@ -73,21 +73,21 @@ function draw() {
             }
         }
 
-        if (cactus_array.length < 10) {
+        if (cactus_array.length < 5) {
             let newC = new cactus();
             newC.x = cactus_array[cactus_array.length - 1].x + 200 + (Math.random() * 500);
-            cactus_array.push(newC)
+            cactus_array.push(newC);
         }
         speed_g += 0.002;
     }
+    // fill(255, 0, 0);
+    // rect(closestCactusDistance.lowestDist + w_g * (1 / 5), floor_y, 10, 10)
+    // rect(closestCactusDistance.secondLowestDist + w_g * (1 / 5), floor_y, 10, 10)
 
-    fill(255, 0, 0);
-    let distances = getClosestCactus();
-    rect(distances.lowestDist + w_g * (1 / 5), floor_y, 10, 10)
-    rect(distances.secondLowestDist + w_g * (1 / 5), floor_y, 10, 10)
 }
 
 function makeNewGen() {
+    console.log("New gen");
     speed_g = startSpeed;
     let totalFitness = 0;
     let bestFit = 0;
@@ -101,30 +101,40 @@ function makeNewGen() {
     }
     fitnessHistory.push(bestPlayer.fitness);
     genNumber++;
-
-    let newPop = [bestPlayer];//add best from last gen to this
+    let copyOfBest = new player();
+    copyOfBest.nn = NeuralNetwork.copy(bestPlayer.nn);
+    // let newPop = [copyOfBest];//add best from last gen to this
+    let newPop = [];//add best from last gen to this
 
     for (let i = 0; i < populationSize - 1; i++) {
-        let parentA = pickParent(totalFitness);
-        let parentB = pickParent(totalFitness);
-        let newPlayer = player.cross(parentA, parentB);
-        if (Math.random() < mutationRate) {
-            newPlayer.nn.mutate();
-        }
+        // let parentA = pickParent(totalFitness);
+        // // let parentA = bestPlayer;
+        // let parentB = pickParent(totalFitness);
+        // let newPlayer = player.cross(parentA, parentB);
+        // // if (Math.random() < mutationRate) {
+        // newPlayer.nn.mutate(mutationRate);
+        // // }
+        // newPop.push(newPlayer);
+
+        let newPlayer = new player();
+        let newNN = NeuralNetwork.copy(bestPlayer.nn);
+        newNN.mutate(mutationRate);
+        newPlayer.nn = newNN;
         newPop.push(newPlayer);
     }
-    players = newPop;
+    players = newPop.slice();
     drawChart(fitnessHistory);
 }
 
 function pickParent(totalFitness) {
-    let tFit = totalFitness;
+    let tFit = totalFitness * Math.random();
     let parent;
-
+    let id = 0;
     while (tFit > 0) {
         // console.log("ree")
-        parent = players[Math.floor(Math.random() * players.length)];
+        parent = players[id];
         tFit -= parent.fitness;
+        id++;
     }
     return parent;
 }
@@ -147,7 +157,7 @@ function getClosestCactus() {
 
 class cactus {
     constructor() {
-        this.x = w_g + Math.random() * 1000;
+        this.x = w_g;
         this.w = 22;
         this.h = 47;
     }
@@ -186,7 +196,7 @@ class player {
     }
 
     show() {
-        fill(0, 80);
+        fill(0, 255 / populationSize);
         rect(this.x, this.y - this.h, this.w, this.h);
     }
 
@@ -228,18 +238,19 @@ class player {
             // console.log("hit");
             this.alive = false;
         }
-        this.fitness++;
+        this.fitness += (speed_g / 10);
 
     }
 
     gravity() {
-        this.vy += 0.5;
+        this.vy += 0.45;
     }
 
     jump() {
         if (this.canJump) {
             this.canJump = false;
             this.vy = -10
+            // this.fitness -= 0.001;
         }
     }
 }
