@@ -12,11 +12,54 @@
 
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+
+    <h1>
+        Chrome Dinosaur Neural Network experiment
+    </h1>
 </head>
 
 <body>
-
+    <div style="padding: 2vw; float: left;">
+        <div id="mainCanvas"></div>
+        <div class="ct-chart ct-perfect-fourth" style="width: 45vh;"></div>
+    </div>
+    <div style="padding: 1vw;float: left;">
+        <hr>
+        <h3 id="GenNum">Generation number: 0</h3>
+        <h3 id="BestFit">Best fitness so far: 0</h3>
+        <h3 id="PlayersAlive">Players alive: 100</h3>
+        <hr>
+        <div style="padding: 5px;">
+            <label id="MutationRateLabel" >Mutation rate:</label>
+            <input type="number" for="MutationRateLabel" step="0.01" min="0" max="1" style="float: right; width: 5vw;" id="Mutation" onchange="changeMutationInput()">
+        </div>
+        <div style="padding: 5px;">
+            <label id="NumberOfPlayersPerGenLabel" >Players per generation:</label>
+            <input type="number" for="NumberOfPlayersPerGenLabel" step="1" style="float: right; width: 5vw;" id="NumberOfPlayersPerGen" onchange="changeNumberOfPlayersPerGenInput()">
+        </div>
+        <div style="padding: 5px;">
+            <label id="SpeedLabel" >Speed of training:</label>
+            <input type="range" for="SpeedLabel" step="1" style="float: right; width: 5vw;" min="1" max="200"  id="Speed" onchange="changeSpeedInput()">
+        </div>
+        
+    </div>
 </body>
-<div class="ct-chart ct-perfect-fourth" style="width: 45vw;"></div>
+
+<script>
+    function changeMutationInput(){
+        let e = document.getElementById("Mutation");
+        mutationRate = parseFloat(e.value);
+    }
+    
+    function changeSpeedInput(){
+        let e = document.getElementById("Speed");
+        cycles = parseFloat(e.value);
+    }
+    
+    function changeNumberOfPlayersPerGenInput(){
+        let e = document.getElementById("NumberOfPlayersPerGen");
+        populationSize = parseFloat(e.value);   
+    }
+</script>
 
 </html>

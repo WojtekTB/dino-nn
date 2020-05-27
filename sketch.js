@@ -1,5 +1,5 @@
-var w_g = 500;
-var h_g = 500;
+var w_g = innerHeight*0.45;
+var h_g = innerHeight*0.45;
 var floor_y = w_g * (2 / 3)
 var speed_g = 5;
 var startSpeed = 5;
@@ -13,13 +13,16 @@ var closestCactusDistance;
 
 var fitnessHistory = [];
 var genNumber = 1;
+var bestFitness = 0;
+var playersAlive = populationSize;
 
 var cycles = 1;
 
 var c;
 
 function setup() {
-    createCanvas(w_g, h_g);
+    let c = createCanvas(w_g, h_g);
+    c.parent("mainCanvas");
     background(100);
     fill(200);
     rect(0, floor_y, w_g, h_g - floor_y);
@@ -29,7 +32,16 @@ function setup() {
     for (let i = 0; i < populationSize; i++) {
         players.push(new player());
     }
-}
+    drawChart(fitnessHistory);
+
+    
+    let Mutation = document.getElementById("Mutation");
+    Mutation.value = mutationRate;
+    let Speed = document.getElementById("Speed");
+    Speed.value = cycles;
+    let NumberOfPlayersPerGen = document.getElementById("NumberOfPlayersPerGen");
+    NumberOfPlayersPerGen.value = populationSize;
+}   
 
 function draw() {
     let alldead = true;
@@ -75,7 +87,7 @@ function draw() {
 
         if (cactus_array.length < 5) {
             let newC = new cactus();
-            newC.x = cactus_array[cactus_array.length - 1].x + 200 + (Math.random() * 500);
+            newC.x = cactus_array[cactus_array.length - 1].x + 300 + (Math.random() * 500);
             cactus_array.push(newC);
 
             // for (let i = 0; i < players.length; i++) {
@@ -90,6 +102,25 @@ function draw() {
     // rect(closestCactusDistance.lowestDist + w_g * (1 / 5), floor_y, 10, 10)
     // rect(closestCactusDistance.secondLowestDist + w_g * (1 / 5), floor_y, 10, 10)
 
+    playersAlive = 0;
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].alive) {
+            playersAlive++;
+        }
+    }
+    updateLabels();
+
+}
+
+function updateLabels(){
+    let GenNum = document.getElementById("GenNum");
+    GenNum.innerHTML = `Generation number: ${genNumber}`;
+
+    let BestFit = document.getElementById("BestFit");
+    BestFit.innerHTML = `Best fitness so far: ${bestFitness}`;
+
+    let PlayersAlive = document.getElementById("PlayersAlive");
+    PlayersAlive.innerHTML = `Players alive: ${playersAlive}`;
 }
 
 function makeNewGen() {
@@ -108,6 +139,11 @@ function makeNewGen() {
             bestFit = p.fitness;
         }
     }
+
+    if(bestFitness < bestFit){
+        bestFitness = bestFit;
+    }
+
     fitnessHistory.push(bestPlayer.fitness);
     genNumber++;
     let copyOfBest = new player();
@@ -116,14 +152,18 @@ function makeNewGen() {
     // let newPop = [];//add best from last gen to this
 
     for (let i = 0; i < populationSize - 1; i++) {
-        // let parentA = pickParent(totalFitness);
-        // // let parentA = bestPlayer;
-        // let parentB = pickParent(totalFitness);
-        // let newPlayer = player.cross(parentA, parentB);
-        // // if (Math.random() < mutationRate) {
-        // newPlayer.nn.mutate(mutationRate);
-        // // }
-        // newPop.push(newPlayer);
+        if (Math.random() < mutationRate) {
+            newPop.push(new player());
+            continue;
+        }
+        let parentA = pickParent(totalFitness);
+        // let parentA = bestPlayer;
+        let parentB = pickParent(totalFitness);
+        let newPlayer = player.cross(parentA, parentB);
+        // if (Math.random() < mutationRate) {
+        newPlayer.nn.mutate(mutationRate);
+        // }
+        newPop.push(newPlayer);
 
         // let newPlayer = new player();
         // let newNN = NeuralNetwork.copy(bestPlayer.nn);
@@ -131,11 +171,11 @@ function makeNewGen() {
         // newPlayer.nn = newNN;
         // newPop.push(newPlayer);
 
-        let newPlayer = new player();
-        let newNN = NeuralNetwork.copy(pickParent(totalFitness).nn);
-        newNN.mutate(mutationRate);
-        newPlayer.nn = newNN;
-        newPop.push(newPlayer);
+        // let newPlayer = new player();
+        // let newNN = NeuralNetwork.copy(pickParent(totalFitness).nn);
+        // newNN.mutate(mutationRate);
+        // newPlayer.nn = newNN;
+        // newPop.push(newPlayer);
     }
     players = newPop.slice();
     drawChart(fitnessHistory);
