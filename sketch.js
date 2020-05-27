@@ -1,6 +1,6 @@
 var w_g = innerHeight*0.45;
-var h_g = innerHeight*0.45;
-var floor_y = w_g * (2 / 3)
+var h_g = w_g * 0.6;
+var floor_y = h_g * (7 / 8)
 var speed_g = 5;
 var startSpeed = 5;
 
@@ -19,8 +19,33 @@ var playersAlive = populationSize;
 var cycles = 1;
 
 var c;
+var clouds = [];
+
+
+//Animation stuff
+var dino_animations = [];
+var cloud;
+var ground;
+var cactusImage;
+var global_x = 0;
+
+
+function preload(){
+    dino_animations.push(loadImage("./images/dino_animation/frame_0.png"));
+    dino_animations.push(loadImage("./images/dino_animation/frame_1.png"));
+    dino_animations.push(loadImage("./images/dino_animation/frame_2.png"));
+
+    cloud = loadImage("./images/cloud.png");
+    cloud = loadImage("./images/cloud.png");
+
+    ground = loadImage("./images/floor.png");
+    
+    cactusImage = loadImage("./images/cactus/cactus.png");
+}
 
 function setup() {
+    // ground.resize(w_g, (w_g/ground.width) * ground.height);
+
     let c = createCanvas(w_g, h_g);
     c.parent("mainCanvas");
     background(100);
@@ -41,14 +66,29 @@ function setup() {
     Speed.value = cycles;
     let NumberOfPlayersPerGen = document.getElementById("NumberOfPlayersPerGen");
     NumberOfPlayersPerGen.value = populationSize;
+    for(let i = 0; i < 3; i++){
+        clouds.push({x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()});
+    }
 }   
 
 function draw() {
     let alldead = true;
 
-    background(100);
-    fill(200);
-    rect(0, floor_y, w_g, h_g - floor_y);
+    background(255);
+
+    for(let i = 0; i < 3; i++){
+        image(cloud, clouds[i].x, clouds[i].y);
+        clouds[i].x -= 1;
+        if(clouds[i].x + cloud.width < 0){
+            clouds[i] = {x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()};
+        }
+    }
+
+
+    image(ground, w_g - global_x%(ground.width*2), floor_y - 15);
+    image(ground, w_g - global_x%(ground.width*2) + ground.width, floor_y - 15);
+    image(ground, w_g - global_x%(ground.width*2) - ground.width, floor_y - 15);
+
     for (let i = 0; i < players.length; i++) {
         if (players[i].alive) {
             players[i].show();
@@ -84,10 +124,11 @@ function draw() {
                 cactus_array.splice(i, 1);
             }
         }
+        global_x += speed_g;
 
         if (cactus_array.length < 5) {
             let newC = new cactus();
-            newC.x = cactus_array[cactus_array.length - 1].x + 300 + (Math.random() * 500);
+            newC.x = cactus_array[cactus_array.length - 1].x + 250 + (Math.random() * 500);
             cactus_array.push(newC);
 
             // for (let i = 0; i < players.length; i++) {
@@ -96,7 +137,7 @@ function draw() {
             //     }
             // }
         }
-        speed_g += 0.002;
+        speed_g += 0.001;
     }
     // fill(255, 0, 0);
     // rect(closestCactusDistance.lowestDist + w_g * (1 / 5), floor_y, 10, 10)
@@ -177,9 +218,14 @@ function makeNewGen() {
         // newPlayer.nn = newNN;
         // newPop.push(newPlayer);
     }
+
     players = newPop.slice();
     drawChart(fitnessHistory);
 }
+
+function keyPressed() {
+    players[0].jump();
+  }
 
 function pickParent(totalFitness) {
     let tFit = totalFitness * Math.random();
@@ -218,8 +264,9 @@ class cactus {
     }
 
     show() {
-        fill(0, 100, 0);
-        rect(this.x, floor_y - this.h, this.w, this.h)
+        // fill(0, 100, 0);
+        // rect(this.x, floor_y - this.h, this.w, this.h)
+        image(cactusImage, this.x, floor_y - this.h, this.w, this.h)
     }
 
     update() {
@@ -227,20 +274,27 @@ class cactus {
     }
 }
 
+
+var playerRation = 0.85;
 class player {
     constructor() {
         this.vy = 0;
         this.y = 0;
         this.x = w_g * (1 / 5);
-        this.w = 25;
+        this.w = 50;
         this.h = 50;
         this.canJump = false;
         this.alive = true;
         this.nn = new NeuralNetwork(5);
         this.nn.addLayer(4);
         this.nn.addLayer(1);
-
+        
         this.fitness = 0;
+        
+        
+        
+        this.w *= playerRation;
+
     }
 
     static cross(a, b) {
@@ -251,8 +305,10 @@ class player {
     }
 
     show() {
-        fill(0, 255 / populationSize);
-        rect(this.x, this.y - this.h, this.w, this.h);
+        // fill(0, 255 / populationSize);
+        // rect(this.x, this.y - this.h, this.w, this.h);
+
+        image(dino_animations[Math.floor(frameCount*0.1%dino_animations.length)], this.x, this.y - this.h, this.w/playerRation, this.h);
     }
 
     makeDecision() {
@@ -277,7 +333,7 @@ class player {
         let d = false;
 
         for (let c of cactus_array) {
-            let RectA = { x1: this.x, y1: this.y - this.h, x2: this.x + this.w, y2: this.y + this.w };
+            let RectA = { x1: this.x, y1: this.y - this.h, x2: this.x + this.w, y2: this.y + this.h };
             let RectB = { x1: c.x, y1: floor_y - c.h, x2: c.x + c.w, y2: floor_y };
             let aLeftOfB = RectA.x2 < RectB.x1;
             let aRightOfB = RectA.x1 > RectB.x2;
@@ -299,7 +355,7 @@ class player {
     }
 
     gravity() {
-        this.vy += 0.45;
+        this.vy += 0.4;
     }
 
     jump() {
