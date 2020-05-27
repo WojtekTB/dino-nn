@@ -14,7 +14,7 @@
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 
     <h1>
-        Chrome Dinosaur Neural Network experiment
+        Chrome Dinosaur Neural Network Experiment
     </h1>
 </head>
 
@@ -42,11 +42,20 @@
             <label id="SpeedLabel" >Speed of training:</label>
             <input type="range" for="SpeedLabel" step="1" style="float: right; width: 5vw;" min="1" max="200"  id="Speed" onchange="changeSpeedInput()">
         </div>
-        
+        <hr>
+        <div>
+            <label id="PrettyLabel" >Pretty: </label>
+            <input type="checkbox" for="PrettyLabel" step="1" style="float: right; width: 5vw;" min="1" max="200"  id="Pretty" checked onchange="changePretty()">
+        </div>
     </div>
 </body>
 
 <script>
+    function changePretty(){
+        let e = document.getElementById("Pretty");
+        pretty = e.checked;
+    }
+
     function changeMutationInput(){
         let e = document.getElementById("Mutation");
         mutationRate = parseFloat(e.value);

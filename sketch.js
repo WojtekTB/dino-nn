@@ -28,6 +28,7 @@ var cloud;
 var ground;
 var cactusImage;
 var global_x = 0;
+var pretty = true;
 
 
 function preload(){
@@ -73,21 +74,27 @@ function setup() {
 
 function draw() {
     let alldead = true;
-
-    background(255);
-
-    for(let i = 0; i < 3; i++){
-        image(cloud, clouds[i].x, clouds[i].y);
-        clouds[i].x -= 1;
-        if(clouds[i].x + cloud.width < 0){
-            clouds[i] = {x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()};
+    
+    
+    if(pretty){
+        background(255);
+        for(let i = 0; i < 3; i++){
+            image(cloud, clouds[i].x, clouds[i].y);
+            clouds[i].x -= 1;
+            if(clouds[i].x + cloud.width < 0){
+                clouds[i] = {x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()};
+            }
         }
+        
+        
+        image(ground, w_g - global_x%(ground.width*2), floor_y - 15);
+        image(ground, w_g - global_x%(ground.width*2) + ground.width, floor_y - 15);
+        image(ground, w_g - global_x%(ground.width*2) - ground.width, floor_y - 15);
+    }else{
+        background(240);
+        fill(200);
+        rect(0, floor_y, w_g, h_g - floor_y);
     }
-
-
-    image(ground, w_g - global_x%(ground.width*2), floor_y - 15);
-    image(ground, w_g - global_x%(ground.width*2) + ground.width, floor_y - 15);
-    image(ground, w_g - global_x%(ground.width*2) - ground.width, floor_y - 15);
 
     for (let i = 0; i < players.length; i++) {
         if (players[i].alive) {
@@ -264,9 +271,12 @@ class cactus {
     }
 
     show() {
-        // fill(0, 100, 0);
-        // rect(this.x, floor_y - this.h, this.w, this.h)
-        image(cactusImage, this.x, floor_y - this.h, this.w, this.h)
+        if(pretty){
+            image(cactusImage, this.x, floor_y - this.h, this.w, this.h)
+        }else{
+            fill(0, 100, 0);
+            rect(this.x, floor_y - this.h, this.w, this.h)
+        }
     }
 
     update() {
@@ -286,7 +296,7 @@ class player {
         this.canJump = false;
         this.alive = true;
         this.nn = new NeuralNetwork(5);
-        this.nn.addLayer(4);
+        // this.nn.addLayer(4);
         this.nn.addLayer(1);
         
         this.fitness = 0;
@@ -305,10 +315,12 @@ class player {
     }
 
     show() {
-        // fill(0, 255 / populationSize);
-        // rect(this.x, this.y - this.h, this.w, this.h);
-
-        image(dino_animations[Math.floor(frameCount*0.1%dino_animations.length)], this.x, this.y - this.h, this.w/playerRation, this.h);
+        if(pretty){
+            image(dino_animations[Math.floor(frameCount*0.1%dino_animations.length)], this.x, this.y - this.h, this.w/playerRation, this.h);
+        }else{
+            fill(0, 255 / populationSize);
+            rect(this.x, this.y - this.h, this.w, this.h);
+        }
     }
 
     makeDecision() {
