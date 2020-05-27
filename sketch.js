@@ -77,6 +77,12 @@ function draw() {
             let newC = new cactus();
             newC.x = cactus_array[cactus_array.length - 1].x + 200 + (Math.random() * 500);
             cactus_array.push(newC);
+
+            // for (let i = 0; i < players.length; i++) {
+            //     if (players[i].alive) {
+            //         players[i].fitness++;
+            //     }
+            // }
         }
         speed_g += 0.002;
     }
@@ -93,6 +99,9 @@ function makeNewGen() {
     let bestFit = 0;
     let bestPlayer;
     for (let p of players) {
+        p.fitness = Math.pow(p.fitness, 2);
+    }
+    for (let p of players) {
         totalFitness += p.fitness;
         if (p.fitness > bestFit) {
             bestPlayer = p;
@@ -103,8 +112,8 @@ function makeNewGen() {
     genNumber++;
     let copyOfBest = new player();
     copyOfBest.nn = NeuralNetwork.copy(bestPlayer.nn);
-    // let newPop = [copyOfBest];//add best from last gen to this
-    let newPop = [];//add best from last gen to this
+    let newPop = [copyOfBest];//add best from last gen to this
+    // let newPop = [];//add best from last gen to this
 
     for (let i = 0; i < populationSize - 1; i++) {
         // let parentA = pickParent(totalFitness);
@@ -116,8 +125,14 @@ function makeNewGen() {
         // // }
         // newPop.push(newPlayer);
 
+        // let newPlayer = new player();
+        // let newNN = NeuralNetwork.copy(bestPlayer.nn);
+        // newNN.mutate(mutationRate);
+        // newPlayer.nn = newNN;
+        // newPop.push(newPlayer);
+
         let newPlayer = new player();
-        let newNN = NeuralNetwork.copy(bestPlayer.nn);
+        let newNN = NeuralNetwork.copy(pickParent(totalFitness).nn);
         newNN.mutate(mutationRate);
         newPlayer.nn = newNN;
         newPop.push(newPlayer);
@@ -238,7 +253,8 @@ class player {
             // console.log("hit");
             this.alive = false;
         }
-        this.fitness += (speed_g / 10);
+        // this.fitness += (speed_g / 10);
+        this.fitness++;
 
     }
 

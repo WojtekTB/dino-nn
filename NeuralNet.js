@@ -162,7 +162,7 @@ class Matrix {
             }
 
             start += len;
-            len = Math.floor((arrayA.length / 3) * Math.random());
+            len = Math.floor((arrayA.length / 2) * Math.random());
 
         }
         let output = Matrix.toMatrix(a.rows, a.columns, n);;
