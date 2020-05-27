@@ -41,7 +41,7 @@ function preload() {
 
     ground = loadImage("./images/floor.png");
 
-    cactusImage = loadImage("./images/cactus/cactus.png");
+    cactusImage = loadImage("./images/cactus.png");
 }
 
 function setup() {
