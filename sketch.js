@@ -1,4 +1,4 @@
-var w_g = innerHeight*0.45;
+var w_g = innerHeight * 0.45;
 var h_g = w_g * 0.6;
 var floor_y = h_g * (7 / 8)
 var speed_g = 5;
@@ -31,7 +31,7 @@ var global_x = 0;
 var pretty = true;
 
 
-function preload(){
+function preload() {
     dino_animations.push(loadImage("./images/dino_animation/frame_0.png"));
     dino_animations.push(loadImage("./images/dino_animation/frame_1.png"));
     dino_animations.push(loadImage("./images/dino_animation/frame_2.png"));
@@ -40,7 +40,7 @@ function preload(){
     cloud = loadImage("./images/cloud.png");
 
     ground = loadImage("./images/floor.png");
-    
+
     cactusImage = loadImage("./images/cactus/cactus.png");
 }
 
@@ -60,37 +60,37 @@ function setup() {
     }
     drawChart(fitnessHistory);
 
-    
+
     let Mutation = document.getElementById("Mutation");
     Mutation.value = mutationRate;
     let Speed = document.getElementById("Speed");
     Speed.value = cycles;
     let NumberOfPlayersPerGen = document.getElementById("NumberOfPlayersPerGen");
     NumberOfPlayersPerGen.value = populationSize;
-    for(let i = 0; i < 3; i++){
-        clouds.push({x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()});
+    for (let i = 0; i < 3; i++) {
+        clouds.push({ x: w_g + w_g * Math.random(), y: (h_g - (h_g - floor_y)) * Math.random() });
     }
-}   
+}
 
 function draw() {
     let alldead = true;
-    
-    
-    if(pretty){
+
+
+    if (pretty) {
         background(255);
-        for(let i = 0; i < 3; i++){
+        for (let i = 0; i < 3; i++) {
             image(cloud, clouds[i].x, clouds[i].y);
             clouds[i].x -= 1;
-            if(clouds[i].x + cloud.width < 0){
-                clouds[i] = {x: w_g + w_g*Math.random(), y: (h_g - (h_g - floor_y))*Math.random()};
+            if (clouds[i].x + cloud.width < 0) {
+                clouds[i] = { x: w_g + w_g * Math.random(), y: (h_g - (h_g - floor_y)) * Math.random() };
             }
         }
-        
-        
-        image(ground, w_g - global_x%(ground.width*2), floor_y - 15);
-        image(ground, w_g - global_x%(ground.width*2) + ground.width, floor_y - 15);
-        image(ground, w_g - global_x%(ground.width*2) - ground.width, floor_y - 15);
-    }else{
+
+
+        image(ground, w_g - global_x % (ground.width * 2), floor_y - 15);
+        image(ground, w_g - global_x % (ground.width * 2) + ground.width, floor_y - 15);
+        image(ground, w_g - global_x % (ground.width * 2) - ground.width, floor_y - 15);
+    } else {
         background(240);
         fill(200);
         rect(0, floor_y, w_g, h_g - floor_y);
@@ -160,7 +160,7 @@ function draw() {
 
 }
 
-function updateLabels(){
+function updateLabels() {
     let GenNum = document.getElementById("GenNum");
     GenNum.innerHTML = `Generation number: ${genNumber}`;
 
@@ -188,7 +188,7 @@ function makeNewGen() {
         }
     }
 
-    if(bestFitness < bestFit){
+    if (bestFitness < bestFit) {
         bestFitness = bestFit;
     }
 
@@ -230,9 +230,9 @@ function makeNewGen() {
     drawChart(fitnessHistory);
 }
 
-function keyPressed() {
-    players[0].jump();
-  }
+// function keyPressed() {
+//     players[0].jump();
+//   }
 
 function pickParent(totalFitness) {
     let tFit = totalFitness * Math.random();
@@ -271,9 +271,9 @@ class cactus {
     }
 
     show() {
-        if(pretty){
+        if (pretty) {
             image(cactusImage, this.x, floor_y - this.h, this.w, this.h)
-        }else{
+        } else {
             fill(0, 100, 0);
             rect(this.x, floor_y - this.h, this.w, this.h)
         }
@@ -298,11 +298,11 @@ class player {
         this.nn = new NeuralNetwork(5);
         // this.nn.addLayer(4);
         this.nn.addLayer(1);
-        
+
         this.fitness = 0;
-        
-        
-        
+
+
+
         this.w *= playerRation;
 
     }
@@ -315,9 +315,9 @@ class player {
     }
 
     show() {
-        if(pretty){
-            image(dino_animations[Math.floor(frameCount*0.1%dino_animations.length)], this.x, this.y - this.h, this.w/playerRation, this.h);
-        }else{
+        if (pretty) {
+            image(dino_animations[Math.floor(frameCount * 0.1 % dino_animations.length)], this.x, this.y - this.h, this.w / playerRation, this.h);
+        } else {
             fill(0, 255 / populationSize);
             rect(this.x, this.y - this.h, this.w, this.h);
         }
