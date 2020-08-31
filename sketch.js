@@ -172,7 +172,7 @@ function updateLabels() {
 }
 
 function makeNewGen() {
-    console.log("New gen");
+    // console.log("New gen");
     speed_g = startSpeed;
     let totalFitness = 0;
     let bestFit = 0;
@@ -198,7 +198,7 @@ function makeNewGen() {
     copyOfBest.nn = NeuralNetwork.copy(bestPlayer.nn);
     let newPop = [copyOfBest];//add best from last gen to this
     // let newPop = [];//add best from last gen to this
-
+    document.getElementById("bestWeights").innerHTML = copyOfBest.nn.weightsString();
     for (let i = 0; i < populationSize - 1; i++) {
         if (Math.random() < mutationRate) {
             newPop.push(new player());

@@ -93,6 +93,14 @@ class NeuralNetwork {
     setHiddenFunction(f) {
         this.hiddenFunction = f;
     }
+
+    weightsString() {
+        let output = "";
+        for (let i = 0; i < this.layers.length; i++) {
+            output += "[" + this.layers[i].toString() + "],";
+        }
+        return output;
+    }
 }
 
 class Matrix {
@@ -113,6 +121,14 @@ class Matrix {
 
     print() {
         console.table(this.data);
+    }
+
+    toString() {
+        let output = this.data[0].toString();
+        for (let i = 1; i < this.data.length; i++) {
+            output += "," + this.data[i].toString();
+        }
+        return output;
     }
 
     set(data, r, c) {
