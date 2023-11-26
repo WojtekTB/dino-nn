@@ -30,6 +30,8 @@ var cactusImage;
 var global_x = 0;
 var pretty = true;
 
+var r = new PRandom();
+
 
 function preload() {
     dino_animations.push(loadImage("./images/dino_animation/frame_0.png"));
@@ -135,14 +137,8 @@ function draw() {
 
         if (cactus_array.length < 5) {
             let newC = new cactus();
-            newC.x = cactus_array[cactus_array.length - 1].x + 250 + (Math.random() * 500);
+            newC.x = cactus_array[cactus_array.length - 1].x + 250 + (r.nextNum() * 500);
             cactus_array.push(newC);
-
-            // for (let i = 0; i < players.length; i++) {
-            //     if (players[i].alive) {
-            //         players[i].fitness++;
-            //     }
-            // }
         }
         speed_g += 0.001;
     }
@@ -172,6 +168,7 @@ function updateLabels() {
 }
 
 function makeNewGen() {
+    r.reset();
     // console.log("New gen");
     speed_g = startSpeed;
     let totalFitness = 0;
@@ -196,34 +193,26 @@ function makeNewGen() {
     genNumber++;
     let copyOfBest = new player();
     copyOfBest.nn = NeuralNetwork.copy(bestPlayer.nn);
-    let newPop = [copyOfBest];//add best from last gen to this
-    // let newPop = [];//add best from last gen to this
+    // let newPop = [copyOfBest];//add best from last gen to this
+    let newPop = []; //add best from last gen to this
     document.getElementById("bestWeights").innerHTML = copyOfBest.nn.weightsString();
     for (let i = 0; i < populationSize - 1; i++) {
-        if (Math.random() < mutationRate) {
-            newPop.push(new player());
-            continue;
-        }
-        let parentA = pickParent(totalFitness);
-        // let parentA = bestPlayer;
-        let parentB = pickParent(totalFitness);
-        let newPlayer = player.cross(parentA, parentB);
         // if (Math.random() < mutationRate) {
-        newPlayer.nn.mutate(mutationRate);
+        //     newPop.push(new player());
+        //     continue;
         // }
+        // let parentA = pickParent(totalFitness);
+        
+        // let parentB = pickParent(totalFitness);
+        // let newPlayer = player.cross(parentA, parentB);
+        
+        // newPlayer.nn.mutate(mutationRate);
+
+        let newPlayer = new player();
+        newPlayer.nn = NeuralNetwork.copy(copyOfBest.nn);
+        newPlayer.nn.mutate(mutationRate);
+        
         newPop.push(newPlayer);
-
-        // let newPlayer = new player();
-        // let newNN = NeuralNetwork.copy(bestPlayer.nn);
-        // newNN.mutate(mutationRate);
-        // newPlayer.nn = newNN;
-        // newPop.push(newPlayer);
-
-        // let newPlayer = new player();
-        // let newNN = NeuralNetwork.copy(pickParent(totalFitness).nn);
-        // newNN.mutate(mutationRate);
-        // newPlayer.nn = newNN;
-        // newPop.push(newPlayer);
     }
 
     players = newPop.slice();

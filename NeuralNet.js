@@ -36,17 +36,17 @@ class NeuralNetwork {
 
     mutate(mutationRate) {
         for (let i = 0; i < this.layers.length; i++) {
-            // let r = Math.floor(Math.random() * this.layers[i].rows);
-            // let c = Math.floor(Math.random() * this.layers[i].columns);
-            // this.layers[i].data[r][c] += (Math.random() * 2) - 1;
-            for (let j = 0; j < this.layers[i].rows; j++) {
-                for (let k = 0; k < this.layers[i].columns; k++) {
-                    // console.log("changed");
-                    if (Math.random() < mutationRate) {
-                        this.layers[i].data[j][k] = (Math.random() * 2) - 1;
-                    }
-                }
-            }
+            let r = Math.floor(Math.random() * this.layers[i].rows);
+            let c = Math.floor(Math.random() * this.layers[i].columns);
+            this.layers[i].data[r][c] += (Math.random() * 2 * mutationRate) - mutationRate;
+            // for (let j = 0; j < this.layers[i].rows; j++) {
+            //     for (let k = 0; k < this.layers[i].columns; k++) {
+            //         // console.log("changed");
+            //         if (Math.random() < mutationRate) {
+            //             this.layers[i].data[j][k] = (Math.random() * 2) - 1;
+            //         }
+            //     }
+            // }
         }
     }
 
